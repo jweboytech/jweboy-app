@@ -14,6 +14,9 @@ RUN pnpm install --force
 # 拷贝剩余代码
 COPY . .
 
+# 复制 .env.production，确保构建时环境变量可用
+COPY .env.production .env.production
+
 # 构建 Next.js 生产版本
 RUN npm run build
 
@@ -29,17 +32,14 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-
 # 设置默认环境变量（可根据需要调整）
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=3800
 
 # 暴露端口
-EXPOSE 3000
+EXPOSE 3800
 
 # 运行 Next.js 生产模式
-CMD ["node", "node_modules/.bin/next", "start"]
+CMD ["npx", "next", "start"]
+
+
