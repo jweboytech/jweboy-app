@@ -24,7 +24,7 @@ const httpLink = createHttpLink({
 const authLink = setContext(async (_, { headers }) => {
   // const token = (await supabase.auth.getSession()).data.session?.access_token;
 
-  console.log(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
   return {
     headers: {
