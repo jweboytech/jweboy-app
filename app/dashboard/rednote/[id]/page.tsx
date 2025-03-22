@@ -39,7 +39,7 @@ const RednoteByIdPage = async ({ params }: { params: { id: string } }) => {
 
   while (hasNextPage) {
     console.log("request=>", query.id, current?.label);
-    const { data } = await apolloClient.query({
+    const { data, errors } = await apolloClient.query({
       query: GET_REDNOTE,
       variables: {
         first: 30, // Supabase 限制每次最多 30 条
@@ -49,6 +49,8 @@ const RednoteByIdPage = async ({ params }: { params: { id: string } }) => {
         },
       },
     });
+
+    console.log("inside", errors);
 
     // 提取新获取的记录
     const newRedNotes = data.red_noteCollection.edges.map((edge) => edge.node);

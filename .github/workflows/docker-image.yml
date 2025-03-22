@@ -1,0 +1,65 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 为构建 Docker 镜像设置 Buildx，可以提高构建速度和兼容性
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 自动获取当前日期并作为环境变量
+      - name: Set the latest version
+        id: get-version
+        run: echo "VERSION=latest" >> $GITHUB_ENV
+
+      - name: Set the project name
+        id: project-name
+        run: echo "PROJECT_NAME=jweboy_app" >> $GITHUB_ENV
+
+      - name: Set the host
+        id: host
+        run: echo "HOST=docker.io/jweboy" >> $GITHUB_ENV
+
+      # Docker 登录
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 构建镜像
+      - name: Build the Docker image
+        run: |
+          docker build . --file Dockerfile \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }} \
+            --tag ${{ env.PROJECT_NAME }}:${{ env.VERSION }}
+
+      # 镜像打标
+      - name: Tag the Docker image
+        run: docker tag ${{ env.PROJECT_NAME }}:${{ env.VERSION }} ${{env.HOST}}/${{ env.PROJECT_NAME }}:${{ env.VERSION }}
+
+      # 推送镜像
+      - name: Push the Docker image
+        run: docker push ${{env.HOST}}/${{ env.PROJECT_NAME }}:${{ env.VERSION }}
+
+      # 飞书通知
+      - name: Trigger feishu webhook
+        run: |
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "msg_type": "text",
+            "content": {
+              "text": "['${{ env.PROJECT_NAME }}:${{ env.VERSION }}'] has been successfully pushed to Docker Hub."
+            }
+          }'
