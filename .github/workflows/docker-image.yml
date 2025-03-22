@@ -57,13 +57,13 @@ jobs:
         run: docker push ${{env.HOST}}/${{ env.PROJECT_NAME }}:${{ env.VERSION }}
 
       # 飞书通知
-      - name: Trigger feishu webhook
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "msg_type": "text",
-            "content": {
-              "text": "['${{ env.PROJECT_NAME }}:${{ env.VERSION }}'] has been successfully pushed to Docker Hub."
-            }
-          }'
+      # - name: Trigger feishu webhook
+      #   run: |
+      #     curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
+      #     -H 'Content-Type: application/json' \
+      #     -d '{
+      #       "msg_type": "text",
+      #       "content": {
+      #         "text": "['${{ env.PROJECT_NAME }}:${{ env.VERSION }}'] has been successfully pushed to Docker Hub."
+      #       }
+      #     }'
