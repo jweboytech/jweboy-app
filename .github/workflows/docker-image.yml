@@ -46,10 +46,7 @@ jobs:
       # 构建镜像，并将 `.env.production` 作为构建参数传入
       - name: Build the Docker image
         run: |
-          docker build . --file Dockerfile \
-            --tag ${{ env.PROJECT_NAME }}:${{ env.VERSION }} \
-            --build-arg NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} \
-            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          docker build . --file Dockerfile --tag ${{ env.PROJECT_NAME }}:${{ env.VERSION }}
 
       # 镜像打标
       - name: Tag the Docker image
